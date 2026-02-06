@@ -1,0 +1,127 @@
+# API Contract: Goals (Autonomous Influencer Network)
+# Base path: /api/v1/goals
+
+openapi: 3.0.3
+info:
+  title: Goals API
+  description: Submit and manage business goals for the autonomous influencer pipeline
+  version: 1.0.0
+
+paths:
+  /goals:
+    post:
+      summary: Submit a business goal
+      operationId: createGoal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [description]
+              properties:
+                description:
+                  type: string
+                  description: High-level business goal text
+                campaign_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+      responses:
+        '201':
+          description: Goal created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid request (e.g. empty description)
+    get:
+      summary: List goals
+      operationId: listGoals
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, planned, in_progress, completed, failed]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of goals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Goal'
+                  next_cursor:
+                    type: string
+  /goals/{goal_id}:
+    get:
+      summary: Get goal by id
+      operationId: getGoal
+      parameters:
+        - name: goal_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Goal with current tasks and status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoalWithTasks'
+        '404':
+          description: Goal not found
+
+components:
+  schemas:
+    Goal:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        status:
+          type: string
+          enum: [draft, planned, in_progress, completed, failed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    GoalWithTasks:
+      allOf:
+        - $ref: '#/components/schemas/Goal'
+        - type: object
+          properties:
+            tasks:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaskSummary'
+    TaskSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [planning, execution, validation]
+        status:
+          type: string
+          enum: [pending, running, completed, failed, rejected]

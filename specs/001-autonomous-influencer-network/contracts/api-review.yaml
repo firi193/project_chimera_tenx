@@ -1,0 +1,135 @@
+# API Contract: Review Queue & Reviewer Actions (HITL Dashboard)
+# Base path: /api/v1/review
+
+openapi: 3.0.3
+info:
+  title: Review API
+  description: Human-in-the-loop review queue and actions
+  version: 1.0.0
+
+paths:
+  /review/queue:
+    get:
+      summary: List review queue items
+      operationId: listReviewQueue
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, approved, rejected, edited]
+            default: pending
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of items in review queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReviewQueueItem'
+  /review/queue/{item_id}:
+    get:
+      summary: Get review queue item by id
+      operationId: getReviewQueueItem
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Item with output content and metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewQueueItemDetail'
+        '404':
+          description: Item not found
+    patch:
+      summary: Submit reviewer action (approve, reject, edit)
+      operationId: submitReviewerAction
+      parameters:
+        - name: item_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [approve, reject, edit]
+                comment:
+                  type: string
+                  nullable: true
+                edit_ref:
+                  type: string
+                  description: Reference to edited content (when action = edit)
+                  nullable: true
+      responses:
+        '200':
+          description: Action recorded; item status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewQueueItem'
+        '400':
+          description: Invalid action or item already resolved
+        '404':
+          description: Item not found
+
+components:
+  schemas:
+    ReviewQueueItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        output_id:
+          type: string
+          format: uuid
+        goal_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [pending, approved, rejected, edited]
+        created_at:
+          type: string
+          format: date-time
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+        sensitive_topic_flags:
+          type: array
+          items:
+            type: string
+    ReviewQueueItemDetail:
+      allOf:
+        - $ref: '#/components/schemas/ReviewQueueItem'
+        - type: object
+          properties:
+            content_preview:
+              type: string
+            content_type:
+              type: string

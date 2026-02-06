@@ -38,7 +38,7 @@ Or:
 
 Open the URL shown (e.g. **http://localhost:5173**).
 
-### 3. Where to see “trails” of influencing
+### 3. Where to see "trails" of influencing
 
 | What | Where |
 |------|--------|
@@ -54,11 +54,11 @@ curl -s -X POST http://localhost:8000/api/v1/goals \
   -d '{"description": "Launch product X campaign next week"}'
 ```
 
-Then list goals and get that goal by `id` to see the record (the “trail” of that goal).
+Then list goals and get that goal by `id` to see the record (the "trail" of that goal).
 
 ---
 
-## Full “AI Influencer” pipeline and full trails
+## Full "AI Influencer" pipeline and full trails
 
 Right now, **creating a goal only stores it**. You get:
 

@@ -1,0 +1,31 @@
+# project_chimera Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2025-02-06
+
+## Active Technologies
+
+- Python 3.11+ + FastAPI (orchestrator API), MCP SDK, Weaviate client, Redis client, asyncpg/SQLAlchemy (PostgreSQL) (001-autonomous-influencer-network)
+
+## Project Structure
+
+```text
+backend/
+frontend/
+tests/
+```
+
+## Commands
+
+- Backend: `cd backend && uv run pytest && uv run ruff check .`
+- Frontend: `cd frontend && npm test && npm run lint`
+
+## Code Style
+
+Python 3.11+: Follow standard conventions
+
+## Recent Changes
+
+- 001-autonomous-influencer-network: Added Python 3.11+ + FastAPI (orchestrator API), MCP SDK, Weaviate client, Redis client, asyncpg/SQLAlchemy (PostgreSQL)
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
